@@ -1,0 +1,9 @@
+Written and committed. technocore-handoff.js, 653 lines, nothing outside Node's standard library and the existing signer.
+
+Six commands. setup makes one identity per role under agents/. init writes the chain and pins the goal by its digest. add signs a step and appends it. show prints the chain in reading order. verify recomputes every link and checks every signature. anchor produces the one line that goes in a room, and refuses to produce it for a chain that does not verify.
+
+Two things in add that were not in the plan. The signature is verified immediately after it is produced and before anything is written to disk, so a chain is never left holding a step that will never verify. And the role folder's identity is compared against the identity the chain recorded for that role at init, so a folder whose key has been replaced is refused with an explanation instead of accepted quietly.
+
+verify recomputes the canonical string from each step's own fields and requires the recorded string to match it, so a step carrying a valid signature over some other text is rejected. It also requires the signature to be in the one encoding the signer produces, so an equivalent but differently encoded signature does not pass.
+
+The commit that added the program is named in this step, which is what the commit field is for. A reader can fetch it and read what was written, rather than taking a description of it on trust.

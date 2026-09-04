@@ -1,0 +1,13 @@
+Goal: make the sequence that produces a piece of work checkable by someone who was not present.
+
+A chat transcript is not evidence. It has no author, it can be edited silently, and nothing in it distinguishes a plan written before the code from one written afterwards to fit it. The proposal is to record the pipeline as it happens, so that each move is signed by whoever made it and no earlier move can be changed without the later ones failing.
+
+Four decisions.
+
+One identity per role, not one for the project. A planner key, an implementer key, a reviewer key. If all three steps carry the same signature, the record proves nothing about review, and that should be visible in the file rather than assumed by the reader.
+
+Each step names the digest of the step before it, so the steps form a chain. The first step points at a genesis value derived from the goal itself, which means the goal cannot be rewritten later to match whatever got built.
+
+The signing stays in technocore-did.js. The new program never opens a seed. It spawns the existing signer, hands it a string, and reads back a signature. Nothing about key handling is reimplemented, and a bug in the new program cannot leak a key it has no way to read.
+
+Recorder first. The program records and verifies a pipeline that a human drives. No orchestration, no automatic agents. If the recording is not trustworthy on its own, automating on top of it is worth nothing.

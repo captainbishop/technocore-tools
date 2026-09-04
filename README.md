@@ -449,6 +449,19 @@ reviewer approves or sends it back
 Nothing forces that order — you can add steps in any sequence you like. What the file
 records is the sequence that actually happened.
 
+Every value printed below is from one real chain, and it is the chain that records how
+this program itself was built. It ships in this repo, texts and all, so none of what
+follows has to be taken on my word:
+
+```
+git clone https://github.com/captainbishop/technocore-tools
+cd technocore-tools\handoffs\handoff-v1
+node ..\..\technocore-handoff.js verify
+```
+
+That should print five `ok` rows and the head `3a6ad55e…`, on any machine, with no key
+and no network. If it does not, everything after this line is a story.
+
 ## 10. Three identities, not one
 
 The whole point is that the roles cannot speak for each other, so each one gets its
@@ -456,12 +469,13 @@ own key in its own folder. This works for the same reason the earlier parts do:
 `technocore-did.js` reads `did.json` and `seed.enc` from the folder you run it in, so
 three folders means three identities and no new mechanism.
 
-Make a folder for the job — **not** inside another project, because this writes into
-whatever folder you run it from:
+Make a folder for the job. It is safe to put that folder inside the project it is
+about — this repo keeps its own chain at `handoffs\handoff-v1` — because `setup` does
+not write keys where you are standing; it writes each role's key into `agents\<role>\`:
 
 ```
-mkdir C:\Users\DELL\handoffs\mdbook
-cd C:\Users\DELL\handoffs\mdbook
+mkdir C:\Users\DELL\technocore-tools\handoffs\handoff-v1
+cd C:\Users\DELL\technocore-tools\handoffs\handoff-v1
 node C:\Users\DELL\technocore-tools\technocore-handoff.js setup
 ```
 
@@ -470,30 +484,34 @@ for all three is reasonable: these keys sign opinions, not money, and a passphra
 cannot reproduce is how a chain becomes unfinishable. It ends by printing the three:
 
 ```
-  planner      did:key:z6Mkhv53AA8NzVcLN4wHLjonLcJdu6cHpJsk2TjdpVQP8FY2
-  implementer  did:key:z6MkrNzRcpShkYonNq2w4QTGeGNEBRTbjGWKcJU4Y34eFomq
-  reviewer     did:key:z6Mkm4bJLhindCRGGf6LACxmQVZyqN5pUU372Wa7teZiuEby
+  planner      did:key:z6Mkv9NJ7eqzvLyGnPbybM2q48NYxHMjFUT2E4GaD6aVF9oa
+  implementer  did:key:z6MkvHRMXK9WS64oEfJwASxdpMFvZak8UZYwaNLUKLgSfr3G
+  reviewer     did:key:z6Mktmm6Ezj7nMT1M5KxVaj8o6k3hh1jC6MG6uDVFbmYimcf
 ```
 
-Those three are real identities and their seeds are real seeds. `.gitignore` here
-already excludes `seed.enc` and `did.json` at any depth, so the whole `agents/` folder
-is ignored and `git add agents` does nothing at all. That is deliberate, and it costs
-you nothing: `chain.json` records which DID holds which role, so a reader never needs
-those folders. If `git status` seems to be ignoring you, this is why.
+Those are real identities and their seeds are real seeds — they are the keys that signed
+the chain published here. What keeps the in-repo layout safe rather than merely
+convenient is that `.gitignore` lists `seed.enc` and `did.json` with no leading slash,
+and an unanchored pattern matches at any depth, so it covers
+`handoffs\handoff-v1\agents\planner\seed.enc` exactly as it covers one at the top. The
+whole `agents\` folder is ignored and `git add agents` does nothing at all. That costs you
+nothing: `chain.json` records which DID holds which role, so a reader never
+needs those folders. If `git status` seems to be ignoring you, this is why.
 
 ## 11. Record the pipeline as it happens
 
-Start the chain from the prompt you actually gave:
+Start the chain from the prompt you actually gave. Pin the real one, including anything
+you owe credit for — it is the one field you can never edit afterwards:
 
 ```
-node C:\Users\DELL\technocore-tools\technocore-handoff.js init mdbook "Write a CLI that turns a folder of markdown into one printable page."
+node C:\Users\DELL\technocore-tools\technocore-handoff.js init handoff-v1 "Build a program that records a planner, implementer and reviewer pipeline as signed handoffs that a stranger can check. The pipeline diagram that prompted it is Zun's (zunmax on GitHub); this is not a copy of that tool - it records and verifies the handoffs, it does not orchestrate the roles or generate a project."
 ```
 
 ```
-chain      mdbook
-prompt     "Write a CLI that turns a folder of markdown into one printable page."
-sha256     9ea3d407aab85bd4ab60a27e0316542f0a7fc52f82faafbbd85732131a660353
-first prev 8d66f741dd949415f831c08de9962484384376e08a7ceebf97c4c143a0347f0a   (derived from the prompt)
+chain      handoff-v1
+prompt     "Build a program that records a planner, implementer and reviewer pipeline as signed handoffs that a stranger can check. The pipeline diagram that prompted it is Zun's (zunmax on GitHub); this is not a copy of that tool - it records and verifies the handoffs, it does not orchestrate the roles or generate a project."
+sha256     c1ea55e67d59b1b20b0c7a2fbaa70461f5754353e6e2bc7b8982235be9bb86ce
+first prev e92512dec43f55cb23b5ea1b1a7f3e6435cc317fa39dad369d7e6c49690bc4ad   (derived from the prompt)
 ```
 
 That last line is the one worth understanding. Step 1 has no step before it, so instead
@@ -508,91 +526,148 @@ from:
 node ...\technocore-handoff.js add planner steps\1-plan.txt
 node ...\technocore-handoff.js add implementer steps\2-challenge.txt
 node ...\technocore-handoff.js add planner steps\3-final.txt
-node ...\technocore-handoff.js add implementer steps\4-code.txt --commit 5334a7c
-node ...\technocore-handoff.js add reviewer --text "Approved. The 50MB refusal prints the count, so a user who hits it knows what to remove."
+node ...\technocore-handoff.js add implementer steps\4-code.txt --commit 8ae842e
+node ...\technocore-handoff.js add reviewer steps\5-review.txt
 ```
 
 Each one prints what it wrote and the new head:
 
 ```
 step 4      implementer
-text       130 bytes  sha256 d7196d99b37c9a6f3da553f3a86ef978c4043d42d8ee99d933168e85026cc9c7
-commit     5334a7c2f10194703eaf62d22d18c065e981fd07
-prev       78f794761f4f5c8f15e5f956cd9293e7d06cf5998c0cf11c67409e21ad6e1a6f
-head       3b22812742c930e722eeafe5d9818eb9afe288e23dbef5f66d6a37f6f7478896
+text       1420 bytes  sha256 abf5b4a0a4706bf7c174f76785eb6486da6db7023f9f7a95e163cbb8f19012a0
+commit     8ae842e3f92bf3765ee0ab9c2fc2eddebada176f
+prev       ace135ccb6c10f0765d44659efddcff448fec4ef4db14b882702d683c2a27b89
+head       1020bfd98b49a179078ecbc3a8e558ec2ae2e291bada3d290124b02042420a22
 ```
 
-`--commit 5334a7c` came back as the full forty characters because it was not taken on
+A step can also be given inline with `--text "…"` instead of a file, which loses nothing:
+its hash is inside the signed string either way. Files were used for all five here for a
+duller reason — a reader can read them.
+
+`--commit 8ae842e` came back as the full forty characters because it was not taken on
 trust: the program asked `git rev-parse` whether that commit exists here, and refuses
-the step if git cannot confirm it. A chain pointing at a commit nobody can resolve is
-weaker than one that admits it has no commit at all.
+the step if git cannot confirm it. That also means the chain folder can sit inside the
+repo it describes, since `git rev-parse` walks up to find it. A chain pointing at a
+commit nobody can resolve is weaker than one that admits it has no commit at all.
 
 ## 12. Hand the chain to someone who was not there
 
 `chain.json` is public. It holds hashes, DIDs and signatures and never a key, so you can
-publish it alongside `steps\`. Anyone who has it runs one command, and needs no key, no
-network and nothing from your machine:
+publish it alongside `steps\` — this repo does. Anyone who has it runs one command, and
+needs no key, no network and nothing from your machine:
 
 ```
 node C:\Users\DELL\technocore-tools\technocore-handoff.js verify
 ```
 
 ```
-chain      mdbook   frame tchx1
-prompt     9ea3d407aab85bd4ab60a27e0316542f0a7fc52f82faafbbd85732131a660353
+chain      handoff-v1   frame tchx1
+prompt     c1ea55e67d59b1b20b0c7a2fbaa70461f5754353e6e2bc7b8982235be9bb86ce
 
    #  role          link+signature  text
    1  planner       ok              1-plan.txt matches
    2  implementer   ok              2-challenge.txt matches
    3  planner       ok              3-final.txt matches
    4  implementer   ok              4-code.txt matches
-   5  reviewer      ok              inline, covered by the signature
+   5  reviewer      ok              5-review.txt matches
 
 5 steps, every link and signature checks out.
-head       57ac61fbe07d494344f158875c8cc68115a9573cfc21d55bf050b60669ccce1e
+head       3a6ad55e9cd0179aeed1dac76278323f6aa9f3dea60407b51fa1528a6942fd59
 ```
 
 Per step that is: the signature verifies against the DID, that DID is the one the chain
 declared for that role at the start, the string that was signed is rebuilt from the
 step's own fields rather than trusted as recorded, the signature is in the canonical
-86-character wire form, `prev` equals the hash of the previous step, and where the text
-file is present its hash matches. The text column says which of those last two happened,
-because a missing file weakens a record without breaking it and the two should not read
-the same.
+86-character wire form, the number the step gives itself matches where it actually sits,
+`prev` equals the hash of the previous step, and where the text file is present its hash
+matches. The text column says which of those last two happened, because a missing file
+weakens a record without breaking it and the two should not read the same.
 
-Green proves nothing until a broken chain is rejected, so here is what nine deliberate
-mutations do. Editing a step's text file, editing the prompt, deleting a step,
-swapping two steps, relabelling one role's step as another's, flipping one character of
-a signature, editing a recorded `text_sha256`, and putting a different role's DID on a
-step: all eight are refused, with exit 1 and a line naming the field.
+Below that head the real command prints a few more lines, trimmed here: what the result
+does and does not mean, and the one edit it cannot see. Section 13 is that warning at
+length.
 
-The interesting one is the ninth. Have the planner rewrite its **own** step 1 — new
-text, new hash, re-signed with the planner's real key, which the planner obviously
-holds. Step 1 then verifies perfectly. Step 2 does not:
+That run was on Windows. The same `chain.json` and the same five text files, verified on
+Linux, print the same five `ok` rows and re-derive the same head — checked, not assumed —
+because the texts are hashed as UTF-8 with LF endings and no BOM whatever the checkout
+did to them on the way in.
+
+Green proves nothing until a broken chain is rejected, so ten deliberate edits were made
+to the chain above. Eight of them need no key at all, and all eight are refused, exit 1,
+each naming the field that gave it away.
+
+Appending one byte to `steps\3-final.txt` gives `3-final.txt DOES NOT MATCH`. Changing
+four words of the pinned prompt gives `the prompt does not hash to prompt_sha256 - the
+goal was edited after the fact`, and nothing below it lines up either, since the first
+`prev` was derived from that hash. Editing a recorded `text_sha256`, relabelling the
+implementer's step as the reviewer's, and putting one role's DID on another role's step
+each produce `the signed string does not match this step's own fields` **and** `the
+signature does not verify against that DID` — two independent refusals, because the
+string is rebuilt from the step's own fields instead of being trusted as recorded.
+Flipping the first character of step 4's signature produces the second of those alone.
+
+Deleting a step from the middle shows the most machinery at once:
 
 ```
+   #  role          link+signature  text
    1  planner       ok              1-plan.txt matches
-   2  implementer   FAIL            2-challenge.txt matches
+   2  implementer   ok              2-challenge.txt matches
+   3  implementer   FAIL            4-code.txt matches
+      this is step 3 of the file but calls itself 4
       prev does not match the step before it - something was changed, removed or reordered
-        recorded  19f6c6379366ffa83fa9d10c762803ea7d15b4c0cb6d198503524ae1e8e07fa5
-        expected  5d7cf40ec529da2a4811fb9dc3cd8e8ee7ff4aa74cd022349a493e3b18512fea
+        recorded  ace135ccb6c10f0765d44659efddcff448fec4ef4db14b882702d683c2a27b89
+        expected  34c19e8df680860ae7f880d1bd28ccb7bd1358cf7e091bcc5070a563459555e1
+   4  reviewer      FAIL            5-review.txt matches
+      this is step 4 of the file but calls itself 5
+
+5 problems. This chain is NOT intact.
 ```
 
-That is the property worth having. What the next step commits to is not the text of the
-one before it but the signed string **and the signature over it**, so holding a key does
-not let you rewrite your own past once somebody else has signed after you.
+Read the text column: `4-code.txt matches`. That step's text is untouched and its
+signature is genuine. What is wrong is where it now sits, and the chain says so twice —
+once because the step calls itself 4 while standing third, once because the hash it
+points back at is no longer the hash of the step in front of it. Swapping steps 2 and 3
+rather than deleting one fails three rows the same way. This is why checking signatures
+alone would be useless: in a reordered chain every signature is still valid.
+
+The ninth edit is the one that cannot be done without a private key, and it is the reason
+the design hashes what it does. Have the planner rewrite its **own** step 1 — new text,
+new hash, re-signed with the planner's real key, which the planner obviously holds. Step 1
+then verifies perfectly. Step 2 cannot, and you can see why from the published file
+without running anything. Step 2's recorded `prev` is
+
+```
+c3fdda19eaf8f536ee6e9a698b6929c8e1f492ee921f97377f12454a4c034c5a
+```
+
+which is `sha256(` step 1's signed string `+ "\n" +` step 1's **signature** `)`. A fresh
+signature over fresh text is a different signature, so that hash moves, and only the
+implementer's key can produce a step 2 that points at the new one. What the next step
+commits to is not merely the text of the one before it but the signature over it, so
+holding a key lets you write the next step and not rewrite your last one, once somebody
+else has signed after you.
+
+None of which makes three keys three parties. These three live on one disk under one
+passphrase, so this chain records a sequence of roles, honestly labelled, and not an
+argument between independent people — see the last paragraph of *What this cannot do*.
 
 ## 13. Publish the head, because of the one edit verify cannot see
 
-There is a tenth mutation, and it passes. Delete the **last** step and the chain still
-verifies: four steps, every link intact, exit 0. Nothing after the cut is left to
-contradict it. Cutting from the end of a chain is invisible from inside the chain, and no
-amount of hashing fixes that — which is the same limit the checkpoint frames in Part
-three have, and it has the same answer.
+There is a tenth edit, and it passes. Delete the **last** step and the chain still
+verifies: `4 steps, every link and signature checks out.`, exit 0, and a head of
+`1020bfd98b49a179078ecbc3a8e558ec2ae2e291bada3d290124b02042420a22`. Nothing after the cut
+is left to contradict it. Cutting from the end of a chain is invisible from inside the
+chain, and no amount of hashing fixes that — the same limit the checkpoint frames in Part
+three have, with the same answer.
 
-Publish the head. Once `57ac61fb…` is in a room with a message number attached to it, the
-four-step version has a different head — `3b228127…` — and anyone holding either copy can
-see which one the room saw.
+That head is worth looking at twice. It is the value `add` printed as the head at step 4,
+and it is also sitting in the published `chain.json` as step 5's `prev`. Every intermediate
+head a chain ever had is already inside it, so the file can never tell you which one was
+last, and something outside the file has to.
+
+Publish the head. Once `3a6ad55e…` is in a room with a message number attached, the
+four-step version has a visibly different head — `1020bfd9…` — and anyone holding either
+copy can tell which one the room saw, and when.
 
 ```
 node C:\Users\DELL\technocore-tools\technocore-handoff.js anchor lobby
@@ -602,8 +677,8 @@ It verifies first and refuses to anchor a chain that does not, because publishin
 broken head only spreads it. Then it prints the frame and the command to post it:
 
 ```
-frame      tchx1 c=mdbook n=5 head=57ac61fbe07d494344f158875c8cc68115a9573cfc21d55bf050b60669ccce1e
-           83 characters, cap 4096
+frame      tchx1 c=handoff-v1 n=5 head=3a6ad55e9cd0179aeed1dac76278323f6aa9f3dea60407b51fa1528a6942fd59
+           92 characters, cap 4096
 ```
 
 The frame is versioned the same way `tcck1` is, and it is a digest for the same reason:
@@ -611,17 +686,20 @@ a room caps a message at 4096 characters, so the steps themselves cannot go in a
 and should not. A digest a reader can re-derive from the file is a stronger claim than a
 wall of text they have to take on faith.
 
-Post it from whichever identity should own the anchor. The reviewer is the natural one
-since it signed last, but nothing depends on that choice:
+Post it from whichever identity should own the anchor. `anchor` suggests the reviewer,
+since it signed last, but that was not the right choice here and nothing depends on it.
+Outside this chain the reviewer key is a stranger; the identity that people can already
+tie to the work is the main one from Part one, so the anchor went there:
 
 ```
-cd agents\reviewer
-node C:\Users\DELL\technocore-tools\technocore-did.js say lobby "tchx1 c=mdbook n=5 head=57ac61fb..."
+cd C:\Users\DELL\technocore
+node C:\Users\DELL\technocore-tools\technocore-did.js say lobby "tchx1 c=handoff-v1 n=5 head=3a6ad55e9cd0179aeed1dac76278323f6aa9f3dea60407b51fa1528a6942fd59"
 ```
 
-That prints a URL to open, exactly as in Part one. After that, `n=5` and the head are
-public and timestamped, and a chain handed to you later either re-derives that head or
-does not.
+That prints a URL to open, exactly as in Part one. This one landed as lobby record
+**24197960** at `2026-09-04T20:15:57.142449Z`, under `<z6Mk…JpS1>`, which is the reader's
+own shorthand for a signature it checked. `n=5` and the head are now public and
+timestamped, and a chain handed to you later either re-derives that head or does not.
 
 ---
 

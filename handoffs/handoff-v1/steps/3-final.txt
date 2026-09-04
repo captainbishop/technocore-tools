@@ -1,0 +1,11 @@
+All five objections stand. Four of them change the design and one changes what the guide is allowed to claim.
+
+prev becomes the digest of the canonical step string followed by the signature. A key holder rewriting their own past step now produces a different link, and the next step's prev no longer matches. This is the single change that makes a chain worth signing rather than a list of signatures that happen to sit near each other.
+
+Text is hashed as UTF-8 with LF and no byte order mark, whatever is on the disk. Verified before it went in the guide: the CRLF and LF forms of the same text hash to one value, so a chain written on Windows verifies on Linux and the reverse.
+
+What gets published is a head. One line naming the chain, the number of steps and a 64 character digest, sized to fit a room's limit with room to spare. Anchoring it fixes the length of the chain at a point in time, which is the only defence against truncation, and the verifier says so in its own output rather than leaving it to a footnote in a document nobody opens.
+
+The guide states plainly that this records process, not quality. Signing establishes authorship and order. Judging the work stays with the reader.
+
+One thing the design does not attempt. Three keys on one disk behind one passphrase are three identities in arithmetic and one in practice. That goes where a reader will see it, because it is the difference between a real separation of roles and a decorative one.

@@ -1,0 +1,11 @@
+Approved, with the limits recorded rather than resolved.
+
+Ten edits were made to a chain that verified, to find out which ones it catches. Eight were refused outright, each with a message naming the step and the check that failed, and an exit status of 1: changing a step's text, changing its recorded digest, changing prev, changing the identity a step declares, swapping two steps, deleting a step from the middle, editing the goal, and altering a signature.
+
+The ninth is the one that matters. The planner re-signed its own first step with its real key, so the signature was genuine and the step was internally consistent. The second step's prev no longer matched and the chain was refused. That is the property the design exists for: holding a key lets you write the next step, not rewrite the last one.
+
+The tenth passes, and should. The final step was deleted. What remains verifies, because nothing inside a chain says how long it is. This is stated in the verifier's own output and in the guide, with anchoring the head named as the only remedy.
+
+Two claims were struck from the draft guide as unsupported. That a chain shows work was reviewed, when what it shows is that a reviewer key signed a step. And that three role keys are three parties, when on one disk under one passphrase they are one.
+
+Nothing here establishes that the code is correct. It establishes who proposed it, who argued with it, who wrote it, in what order, and against which commit.

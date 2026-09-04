@@ -1,0 +1,11 @@
+Five objections, in order of how much damage they do.
+
+The chain does not stop a lie. Any of the three keys can sign a step whose text is false. A signature establishes who said something and when, not that it is true. If the guide implies otherwise it will be read as a claim to have automated judgment, which this does not do.
+
+Hashing the step text is not enough. If prev is the digest of the text alone, the holder of a key can re-sign their own past step with different wording and the chain still matches. The digest has to cover the signature as well, so that replacing a step changes the value the next step already committed to.
+
+Technocore refuses long messages. The text cap is 4096 bytes, so a chain of any real length cannot be posted to a room. Whatever gets published has to be a fixed-size digest, and the guide has to say what publishing it does and does not settle.
+
+Line endings will break this across machines. The repository is checked out with CRLF on Windows and LF on Linux. If step files are hashed as raw bytes off the disk, the same chain verifies on one machine and fails on the other, and the failure will look exactly like tampering. Hashing has to be defined on the normalized text, and that has to be tested rather than assumed.
+
+Truncation is invisible from inside. Dropping the last step leaves a chain that is internally consistent, because nothing in a chain records how long it is meant to be. No amount of hashing fixes this. It is a limit, and it belongs in the output of the verifier, not only in a document.

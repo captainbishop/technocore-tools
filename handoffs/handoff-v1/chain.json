@@ -1,0 +1,84 @@
+{
+  "frame": "tchx1",
+  "chain": "handoff-v1",
+  "started": "2026-09-04T20:05:15.373Z",
+  "prompt": "Build a program that records a planner, implementer and reviewer pipeline as signed handoffs that a stranger can check. The pipeline diagram that prompted it is Zun's (zunmax on GitHub); this is not a copy of that tool - it records and verifies the handoffs, it does not orchestrate the roles or generate a project.",
+  "prompt_sha256": "c1ea55e67d59b1b20b0c7a2fbaa70461f5754353e6e2bc7b8982235be9bb86ce",
+  "roles": {
+    "planner": "did:key:z6Mkv9NJ7eqzvLyGnPbybM2q48NYxHMjFUT2E4GaD6aVF9oa",
+    "implementer": "did:key:z6MkvHRMXK9WS64oEfJwASxdpMFvZak8UZYwaNLUKLgSfr3G",
+    "reviewer": "did:key:z6Mktmm6Ezj7nMT1M5KxVaj8o6k3hh1jC6MG6uDVFbmYimcf"
+  },
+  "steps": [
+    {
+      "n": 1,
+      "role": "planner",
+      "did": "did:key:z6Mkv9NJ7eqzvLyGnPbybM2q48NYxHMjFUT2E4GaD6aVF9oa",
+      "at": "2026-09-04T20:08:36.453Z",
+      "source": "1-plan.txt",
+      "bytes": 1429,
+      "text_sha256": "986b7e96bae3150a92e38c615b4c80ed8295478c9028b3546a2dd440cb457e0f",
+      "commit": null,
+      "prev": "e92512dec43f55cb23b5ea1b1a7f3e6435cc317fa39dad369d7e6c49690bc4ad",
+      "chain": "handoff-v1",
+      "signed": "tchx1|handoff-v1|1|planner|did:key:z6Mkv9NJ7eqzvLyGnPbybM2q48NYxHMjFUT2E4GaD6aVF9oa|e92512dec43f55cb23b5ea1b1a7f3e6435cc317fa39dad369d7e6c49690bc4ad|986b7e96bae3150a92e38c615b4c80ed8295478c9028b3546a2dd440cb457e0f|-",
+      "sig": "T2KYsxw62s2YKWh3eI3xumeUZ1pSc-rUmIcNakShpbVxww5XwsdHWuvChIbcl47m62g4uwdsTPSwwFs8kJYUAQ"
+    },
+    {
+      "n": 2,
+      "role": "implementer",
+      "did": "did:key:z6MkvHRMXK9WS64oEfJwASxdpMFvZak8UZYwaNLUKLgSfr3G",
+      "at": "2026-09-04T20:08:46.601Z",
+      "source": "2-challenge.txt",
+      "bytes": 1549,
+      "text_sha256": "b235961220eac70da863bf04bcdfd8b8a56662f447df259538f02f98485a1db2",
+      "commit": null,
+      "prev": "c3fdda19eaf8f536ee6e9a698b6929c8e1f492ee921f97377f12454a4c034c5a",
+      "chain": "handoff-v1",
+      "signed": "tchx1|handoff-v1|2|implementer|did:key:z6MkvHRMXK9WS64oEfJwASxdpMFvZak8UZYwaNLUKLgSfr3G|c3fdda19eaf8f536ee6e9a698b6929c8e1f492ee921f97377f12454a4c034c5a|b235961220eac70da863bf04bcdfd8b8a56662f447df259538f02f98485a1db2|-",
+      "sig": "xu3EGbu4iUcY-YllEc3QpAMcTQvU_5U0EmAxRYnVNAm5kQUgxsC4WMYlpDKefNNjVIK8OOCCQspouYy_RYC2DA"
+    },
+    {
+      "n": 3,
+      "role": "planner",
+      "did": "did:key:z6Mkv9NJ7eqzvLyGnPbybM2q48NYxHMjFUT2E4GaD6aVF9oa",
+      "at": "2026-09-04T20:08:56.068Z",
+      "source": "3-final.txt",
+      "bytes": 1464,
+      "text_sha256": "d8afce77ed93c0d407281912bba5fd6c33aa8d3f851d95d00e154d6e01f6092b",
+      "commit": null,
+      "prev": "34c19e8df680860ae7f880d1bd28ccb7bd1358cf7e091bcc5070a563459555e1",
+      "chain": "handoff-v1",
+      "signed": "tchx1|handoff-v1|3|planner|did:key:z6Mkv9NJ7eqzvLyGnPbybM2q48NYxHMjFUT2E4GaD6aVF9oa|34c19e8df680860ae7f880d1bd28ccb7bd1358cf7e091bcc5070a563459555e1|d8afce77ed93c0d407281912bba5fd6c33aa8d3f851d95d00e154d6e01f6092b|-",
+      "sig": "SlzRm0ARKtp6Ale3qJaBWmPKtmVn7tnvmgE9vPzmZlOtiYlY6jolmzixGn_NTP4BZQSjnLn31xN2uVQ06U9ZDA"
+    },
+    {
+      "n": 4,
+      "role": "implementer",
+      "did": "did:key:z6MkvHRMXK9WS64oEfJwASxdpMFvZak8UZYwaNLUKLgSfr3G",
+      "at": "2026-09-04T20:09:05.238Z",
+      "source": "4-code.txt",
+      "bytes": 1420,
+      "text_sha256": "abf5b4a0a4706bf7c174f76785eb6486da6db7023f9f7a95e163cbb8f19012a0",
+      "commit": "8ae842e3f92bf3765ee0ab9c2fc2eddebada176f",
+      "prev": "ace135ccb6c10f0765d44659efddcff448fec4ef4db14b882702d683c2a27b89",
+      "chain": "handoff-v1",
+      "signed": "tchx1|handoff-v1|4|implementer|did:key:z6MkvHRMXK9WS64oEfJwASxdpMFvZak8UZYwaNLUKLgSfr3G|ace135ccb6c10f0765d44659efddcff448fec4ef4db14b882702d683c2a27b89|abf5b4a0a4706bf7c174f76785eb6486da6db7023f9f7a95e163cbb8f19012a0|8ae842e3f92bf3765ee0ab9c2fc2eddebada176f",
+      "sig": "ngePb3SwCooYzukJ5oHFi4GIZuOfCmYzaKLmKYjna2yt04MNBbuu-EfcLfVjdNNsMDQnPfqRgg92W-R8mf2RAg"
+    },
+    {
+      "n": 5,
+      "role": "reviewer",
+      "did": "did:key:z6Mktmm6Ezj7nMT1M5KxVaj8o6k3hh1jC6MG6uDVFbmYimcf",
+      "at": "2026-09-04T20:09:16.224Z",
+      "source": "5-review.txt",
+      "bytes": 1465,
+      "text_sha256": "a9861d209adb3625cc3147c67061de43243e9400c8a50508e663ce50c4a91bef",
+      "commit": null,
+      "prev": "1020bfd98b49a179078ecbc3a8e558ec2ae2e291bada3d290124b02042420a22",
+      "chain": "handoff-v1",
+      "signed": "tchx1|handoff-v1|5|reviewer|did:key:z6Mktmm6Ezj7nMT1M5KxVaj8o6k3hh1jC6MG6uDVFbmYimcf|1020bfd98b49a179078ecbc3a8e558ec2ae2e291bada3d290124b02042420a22|a9861d209adb3625cc3147c67061de43243e9400c8a50508e663ce50c4a91bef|-",
+      "sig": "RLR_tBDo9RU3E_EW7FbJO_hMhMx5L0WM_TofICIWtrpnMJ2Me-HuyCaJQ4RUtJ8qq83SwCT_A38SMZv-NR6_Bw"
+    }
+  ]
+}
