@@ -1,6 +1,6 @@
 # technocore-tools
 
-Five small programs for [technocore.chat](https://technocore.chat) — a chat service
+Six small programs for [technocore.chat](https://technocore.chat) — a chat service
 with no accounts, no passwords and no sign-up, where the only thing that proves you
 said something is that you signed it.
 
@@ -10,6 +10,11 @@ it.
 
 The third one is why this exists, and it deserves explaining before anything else,
 because it is the part that nothing else does.
+
+There is a fourth, built on those three rather than beside them: several parties
+working on one job can record who proposed what as a chain of signed handoffs, so that
+the authorship and the order survive without a reader having to trust the transcript
+or the person handing it over. That is Part four, and it is the newest thing here.
 
 ## The thing that happened
 
@@ -50,7 +55,7 @@ Put those two together and you have the sentence this whole toolkit is built aro
 again at nearly every step below — in a backup you have never restored from, in a
 nickname nobody signed, in a comparison made with nothing to compare against. It is
 the same idea wearing different clothes each time, and once you have seen it, the
-design of these five programs stops looking fussy.
+design of these six programs stops looking fussy.
 
 ## What you can do about it
 
@@ -89,7 +94,7 @@ If it prints something beginning `v18`, `v20`, `v22` or higher, you are ready. I
 says node isn't recognised, install it from [nodejs.org](https://nodejs.org) and
 open a fresh terminal afterwards.
 
-You also need the five programs. If you have git, that is these two lines:
+You also need the six programs. If you have git, that is these two lines:
 
 ```
 git clone https://github.com/captainbishop/technocore-tools.git
@@ -418,6 +423,208 @@ tool I wrote. Checkpoint more often than the room forgets.
 
 ---
 
+# Part four — a record of who proposed what
+
+Everything up to here has one identity saying things and one room storing them. This
+part is about a different problem: several parties working on the same job, and a
+reader afterwards who wants to know which of them said what, in what order.
+
+The usual artefact is a transcript. A transcript proves nothing. Anybody can write
+one, in any order, after the event, and nothing inside it distinguishes a real
+argument from an invented one. Three claims in particular are the ones you would want
+and the ones a transcript cannot support: that a given party actually said a given
+thing, that the things were said in the order shown, and that nothing has been
+removed or edited since.
+
+`technocore-handoff.js` records the same conversation as a chain instead. Each step is
+signed by a **different** key and commits by hash to the step before it. The shape it
+expects is one prompt and then a sequence of handoffs:
+
+```
+your prompt -> planner proposes -> implementer challenges ->
+planner finalizes -> implementer writes code (+ a git commit) ->
+reviewer approves or sends it back
+```
+
+Nothing forces that order — you can add steps in any sequence you like. What the file
+records is the sequence that actually happened.
+
+## 10. Three identities, not one
+
+The whole point is that the roles cannot speak for each other, so each one gets its
+own key in its own folder. This works for the same reason the earlier parts do:
+`technocore-did.js` reads `did.json` and `seed.enc` from the folder you run it in, so
+three folders means three identities and no new mechanism.
+
+Make a folder for the job — **not** inside another project, because this writes into
+whatever folder you run it from:
+
+```
+mkdir C:\Users\DELL\handoffs\mdbook
+cd C:\Users\DELL\handoffs\mdbook
+node C:\Users\DELL\technocore-tools\technocore-handoff.js setup
+```
+
+It asks for a passphrase twice per role, six prompts in all. Using the same passphrase
+for all three is reasonable: these keys sign opinions, not money, and a passphrase you
+cannot reproduce is how a chain becomes unfinishable. It ends by printing the three:
+
+```
+  planner      did:key:z6Mkhv53AA8NzVcLN4wHLjonLcJdu6cHpJsk2TjdpVQP8FY2
+  implementer  did:key:z6MkrNzRcpShkYonNq2w4QTGeGNEBRTbjGWKcJU4Y34eFomq
+  reviewer     did:key:z6Mkm4bJLhindCRGGf6LACxmQVZyqN5pUU372Wa7teZiuEby
+```
+
+Those three are real identities and their seeds are real seeds. `.gitignore` here
+already excludes `seed.enc` and `did.json` at any depth, so the whole `agents/` folder
+is ignored and `git add agents` does nothing at all. That is deliberate, and it costs
+you nothing: `chain.json` records which DID holds which role, so a reader never needs
+those folders. If `git status` seems to be ignoring you, this is why.
+
+## 11. Record the pipeline as it happens
+
+Start the chain from the prompt you actually gave:
+
+```
+node C:\Users\DELL\technocore-tools\technocore-handoff.js init mdbook "Write a CLI that turns a folder of markdown into one printable page."
+```
+
+```
+chain      mdbook
+prompt     "Write a CLI that turns a folder of markdown into one printable page."
+sha256     9ea3d407aab85bd4ab60a27e0316542f0a7fc52f82faafbbd85732131a660353
+first prev 8d66f741dd949415f831c08de9962484384376e08a7ceebf97c4c143a0347f0a   (derived from the prompt)
+```
+
+That last line is the one worth understanding. Step 1 has no step before it, so instead
+of a row of zeros its `prev` is derived from the prompt itself. The goal is therefore
+inside the chain: edit it afterwards and every signature downstream stops lining up.
+
+Now put each party's output in a file under `steps\` and append it. A step is signed by
+the role you name, which means that role's folder is where the passphrase prompt comes
+from:
+
+```
+node ...\technocore-handoff.js add planner steps\1-plan.txt
+node ...\technocore-handoff.js add implementer steps\2-challenge.txt
+node ...\technocore-handoff.js add planner steps\3-final.txt
+node ...\technocore-handoff.js add implementer steps\4-code.txt --commit 5334a7c
+node ...\technocore-handoff.js add reviewer --text "Approved. The 50MB refusal prints the count, so a user who hits it knows what to remove."
+```
+
+Each one prints what it wrote and the new head:
+
+```
+step 4      implementer
+text       130 bytes  sha256 d7196d99b37c9a6f3da553f3a86ef978c4043d42d8ee99d933168e85026cc9c7
+commit     5334a7c2f10194703eaf62d22d18c065e981fd07
+prev       78f794761f4f5c8f15e5f956cd9293e7d06cf5998c0cf11c67409e21ad6e1a6f
+head       3b22812742c930e722eeafe5d9818eb9afe288e23dbef5f66d6a37f6f7478896
+```
+
+`--commit 5334a7c` came back as the full forty characters because it was not taken on
+trust: the program asked `git rev-parse` whether that commit exists here, and refuses
+the step if git cannot confirm it. A chain pointing at a commit nobody can resolve is
+weaker than one that admits it has no commit at all.
+
+## 12. Hand the chain to someone who was not there
+
+`chain.json` is public. It holds hashes, DIDs and signatures and never a key, so you can
+publish it alongside `steps\`. Anyone who has it runs one command, and needs no key, no
+network and nothing from your machine:
+
+```
+node C:\Users\DELL\technocore-tools\technocore-handoff.js verify
+```
+
+```
+chain      mdbook   frame tchx1
+prompt     9ea3d407aab85bd4ab60a27e0316542f0a7fc52f82faafbbd85732131a660353
+
+   #  role          link+signature  text
+   1  planner       ok              1-plan.txt matches
+   2  implementer   ok              2-challenge.txt matches
+   3  planner       ok              3-final.txt matches
+   4  implementer   ok              4-code.txt matches
+   5  reviewer      ok              inline, covered by the signature
+
+5 steps, every link and signature checks out.
+head       57ac61fbe07d494344f158875c8cc68115a9573cfc21d55bf050b60669ccce1e
+```
+
+Per step that is: the signature verifies against the DID, that DID is the one the chain
+declared for that role at the start, the string that was signed is rebuilt from the
+step's own fields rather than trusted as recorded, the signature is in the canonical
+86-character wire form, `prev` equals the hash of the previous step, and where the text
+file is present its hash matches. The text column says which of those last two happened,
+because a missing file weakens a record without breaking it and the two should not read
+the same.
+
+Green proves nothing until a broken chain is rejected, so here is what nine deliberate
+mutations do. Editing a step's text file, editing the prompt, deleting a step,
+swapping two steps, relabelling one role's step as another's, flipping one character of
+a signature, editing a recorded `text_sha256`, and putting a different role's DID on a
+step: all eight are refused, with exit 1 and a line naming the field.
+
+The interesting one is the ninth. Have the planner rewrite its **own** step 1 — new
+text, new hash, re-signed with the planner's real key, which the planner obviously
+holds. Step 1 then verifies perfectly. Step 2 does not:
+
+```
+   1  planner       ok              1-plan.txt matches
+   2  implementer   FAIL            2-challenge.txt matches
+      prev does not match the step before it - something was changed, removed or reordered
+        recorded  19f6c6379366ffa83fa9d10c762803ea7d15b4c0cb6d198503524ae1e8e07fa5
+        expected  5d7cf40ec529da2a4811fb9dc3cd8e8ee7ff4aa74cd022349a493e3b18512fea
+```
+
+That is the property worth having. What the next step commits to is not the text of the
+one before it but the signed string **and the signature over it**, so holding a key does
+not let you rewrite your own past once somebody else has signed after you.
+
+## 13. Publish the head, because of the one edit verify cannot see
+
+There is a tenth mutation, and it passes. Delete the **last** step and the chain still
+verifies: four steps, every link intact, exit 0. Nothing after the cut is left to
+contradict it. Cutting from the end of a chain is invisible from inside the chain, and no
+amount of hashing fixes that — which is the same limit the checkpoint frames in Part
+three have, and it has the same answer.
+
+Publish the head. Once `57ac61fb…` is in a room with a message number attached to it, the
+four-step version has a different head — `3b228127…` — and anyone holding either copy can
+see which one the room saw.
+
+```
+node C:\Users\DELL\technocore-tools\technocore-handoff.js anchor lobby
+```
+
+It verifies first and refuses to anchor a chain that does not, because publishing a
+broken head only spreads it. Then it prints the frame and the command to post it:
+
+```
+frame      tchx1 c=mdbook n=5 head=57ac61fbe07d494344f158875c8cc68115a9573cfc21d55bf050b60669ccce1e
+           83 characters, cap 4096
+```
+
+The frame is versioned the same way `tcck1` is, and it is a digest for the same reason:
+a room caps a message at 4096 characters, so the steps themselves cannot go in a record —
+and should not. A digest a reader can re-derive from the file is a stronger claim than a
+wall of text they have to take on faith.
+
+Post it from whichever identity should own the anchor. The reviewer is the natural one
+since it signed last, but nothing depends on that choice:
+
+```
+cd agents\reviewer
+node C:\Users\DELL\technocore-tools\technocore-did.js say lobby "tchx1 c=mdbook n=5 head=57ac61fb..."
+```
+
+That prints a URL to open, exactly as in Part one. After that, `n=5` and the head are
+public and timestamped, and a chain handed to you later either re-derives that head or
+does not.
+
+---
+
 # What this cannot do
 
 A tool that oversells itself is worse than no tool, so here is the honest list. None
@@ -452,6 +659,20 @@ And two of the verdicts sound similar and are not. `frames` saying a fingerprint
 published and signed, and `check` saying a message belongs to it, are separate
 findings. Neither implies the other. That is why they are two commands printing two
 answers instead of one command printing a reassuring tick.
+
+A handoff chain has the matching limit, and one of its own. Steps cut from the **end**
+are invisible from inside the file, for the same reason a fingerprint says nothing
+about what the room forgot before you copied it; publishing the head is the answer to
+both. And the chain proves who signed each step and in what order — never that any of
+it was wise, that the reviewer read what it approved, or that the commit it names
+contains the code the step describes. It records the process. Judging the work is
+still yours.
+
+A last one about all of it: three keys in three folders on one disk, opened with one
+passphrase, are three identities in the arithmetic and one in practice. That is fine
+for recording a process and it is not a separation of duties. If the roles are meant
+to be genuinely independent parties, the keys have to live with genuinely independent
+people.
 
 # Keeping your key safe
 
@@ -491,7 +712,7 @@ the secret in the open.
 Everything past this point is for when you want it. The walkthrough works without
 any of it.
 
-## The five programs, and why there are five
+## The six programs, and why there are six
 
 One job each, and the split is the security design rather than tidiness.
 
@@ -515,6 +736,11 @@ URL built from it has to travel through your clipboard.
 `technocore-backup.js` copies your identity elsewhere and then proves the copy
 opens, by running the signer inside it.
 
+`technocore-handoff.js` records a chain of signed handoffs between three roles, and
+re-checks one. It **holds no key and cannot open one** either: signing is delegated by
+starting the signer inside the role's own folder with your terminal attached, which is
+why the passphrase you type never passes through it and never lands in `chain.json`.
+
 ## Checking my homework
 
 You do not have to take any of that on trust. Those claims are about which building
@@ -535,6 +761,7 @@ each file and this is what you should find:
 | `technocore-checkpoint.js` | `crypto` `fs` | both |
 | `technocore-publish.js` | `fs` `path` `child_process` | both |
 | `technocore-backup.js` | `crypto` `fs` `path` `child_process` | both |
+| `technocore-handoff.js` | `crypto` `fs` `path` `child_process` `technocore-did.js` | any way to open a seed |
 
 The one that talks to the service loads no networking module either — it uses the
 `fetch` that Node has had built in since version 18, which is the only reason for
@@ -611,6 +838,10 @@ the distinction to separate findings from refusals: `APPEND-ONLY` exits 0,
 `GENERATION UNKNOWN` and `NOTHING IN COMMON` — exit 2. So a script can tell "I
 checked and it was fine" from "I checked and it was not" from "I could not check",
 which are three different situations and should never collapse into one.
+
+`technocore-handoff.js` uses only 0 and 1. A chain either re-derives from its own
+contents or it does not, and refusing to write a step is not a third kind of finding
+about a chain that already exists.
 
 
 ## Room names mean things

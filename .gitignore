@@ -27,6 +27,6 @@ did.json
 *.proof.json
 
 # Nothing here needs installing, so this should stay empty forever. If it fills
-# up, something you added has dependencies these five programs do not.
+# up, something you added has dependencies these six programs do not.
 node_modules/
 package-lock.json
