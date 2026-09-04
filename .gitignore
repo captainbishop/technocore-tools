@@ -1,0 +1,32 @@
+# The line that matters most. seed.enc is your identity: 32 secret bytes,
+# encrypted with a passphrase. A passphrase is guessable in a way that 32 random
+# bytes are not, so treat the encryption as a delay, not a wall. And a file that
+# has been in one commit is in the history for good - deleting it later removes
+# it from the newest commit and from nothing else.
+#
+# If you ran "new" in this folder, this line is the only thing between that file
+# and everyone who ever clones you.
+seed.enc
+*.enc
+
+# did.json is public and completely safe to publish - it holds a DID and nothing
+# secret. It is ignored anyway, because a repo that ships one person's did.json
+# hands every reader a folder where the signer finds an identity it has no seed
+# for, and the error that produces reads like a broken program. Put your DID in
+# the README as text instead.
+did.json
+
+# Room exports and everything that travels with them. Megabytes of other
+# people's messages, stale within the hour, and anyone can fetch their own.
+# The .tcck.json sidecar is the one you might want to keep somewhere - it is what
+# lets a later export be checked against an older checkpoint - but keep it with
+# your records, not in a repo other people clone.
+*.jsonl
+*.meta.json
+*.tcck.json
+*.proof.json
+
+# Nothing here needs installing, so this should stay empty forever. If it fills
+# up, something you added has dependencies these five programs do not.
+node_modules/
+package-lock.json

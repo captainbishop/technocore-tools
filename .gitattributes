@@ -1,0 +1,13 @@
+# Every file here is text, and every working copy should hold the same bytes, on
+# whichever operating system it was cloned onto. Without this line, Git on Windows
+# checks these files out with CRLF line endings instead of the LF they were written
+# with. That is harmless for Node - but this repo exists to argue that identical
+# bytes hash to identical fingerprints, so it would be a strange place to let a
+# checkout quietly rewrite bytes.
+#
+# To be clear about what was never at risk: nothing the five programs produce
+# passes through Git. Exports, sidecars and proofs are generated on your machine
+# and ignored by the file next to this one, so no hash and no proof ever depended
+# on Git's line-ending choices. This is only about the source you clone matching
+# the source that was tested.
+* text=auto eol=lf
